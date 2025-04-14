@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react"; // Import useEffect
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import {
   Platform,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native"; // Import useNavigation
+import { useNavigation, useRoute } from "@react-navigation/native"; // Import useRoute along with useNavigation
 
 // Helper functions
 const parseTimeToSeconds = (timeStr) => {
@@ -83,12 +83,39 @@ const initialFormData = {
 };
 
 function CalculatorScreen() {
-  const navigation = useNavigation(); // Get navigation object
+  const navigation = useNavigation();
+  const route = useRoute(); // Get route object to access parameters
   const [formData, setFormData] = useState(initialFormData);
   const [startTime, setStartTime] = useState("");
   const [totalTime, setTotalTime] = useState("");
   const [totalTimeInSeconds, setTotalTimeInSeconds] = useState(0);
   const [saveName, setSaveName] = useState("");
+
+  // Effect to load data when navigating back from SavedPacesScreen
+  useEffect(() => {
+    if (route.params?.selectedPaceSet) {
+      const loadedSet = route.params.selectedPaceSet;
+
+      // Create a new formData object from the loaded set
+      const newFormData = {
+        swim: { ...initialDisciplineState, ...loadedSet.swim },
+        t1: { ...initialTransitionState, ...loadedSet.t1 },
+        bike: { ...initialDisciplineState, ...loadedSet.bike },
+        t2: { ...initialTransitionState, ...loadedSet.t2 },
+        run: { ...initialDisciplineState, ...loadedSet.run },
+      };
+
+      setFormData(newFormData);
+      setStartTime(loadedSet.startTime || "");
+      setTotalTime(loadedSet.totalTime || "");
+      setTotalTimeInSeconds(loadedSet.totalTimeInSeconds || 0);
+      // Optionally pre-fill the save name for easier overwriting/saving
+      setSaveName(loadedSet.name || "");
+
+      // Clear the parameter to prevent reloading on subsequent renders/focus changes
+      navigation.setParams({ selectedPaceSet: null });
+    }
+  }, [route.params?.selectedPaceSet, navigation]); // Dependency array includes the parameter
 
   // Log when formData changes
   useEffect(() => {}, [formData]);

@@ -9,9 +9,10 @@ import {
   TouchableOpacity,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFocusEffect } from "@react-navigation/native"; // Import useFocusEffect
+import { useFocusEffect, useNavigation } from "@react-navigation/native"; // Import useNavigation
 
-function SavedPacesScreen({ navigation }) {
+function SavedPacesScreen() {
+  const navigation = useNavigation(); // Use hook to get navigation
   const [savedPaces, setSavedPaces] = useState([]);
 
   const loadSavedPaces = useCallback(async () => {
@@ -69,6 +70,11 @@ function SavedPacesScreen({ navigation }) {
     );
   };
 
+  const loadPaceSet = (paceSet) => {
+    // Navigate back to Calculator and pass the selected set as a parameter
+    navigation.navigate("Calculator", { selectedPaceSet: paceSet });
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
       <View style={styles.itemTextContainer}>
@@ -79,12 +85,21 @@ function SavedPacesScreen({ navigation }) {
         {/* Optional: Display more details like creation date */}
         {/* <Text style={styles.itemDate}>Gespeichert: {new Date(item.createdAt).toLocaleDateString()}</Text> */}
       </View>
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={() => handleDelete(item.id, item.name)}
-      >
-        <Text style={styles.deleteButtonText}>Löschen</Text>
-      </TouchableOpacity>
+      <View style={styles.itemButtonContainer}>
+        {/* Add Load Button */}
+        <TouchableOpacity
+          style={[styles.actionButton, styles.loadButton]}
+          onPress={() => loadPaceSet(item)}
+        >
+          <Text style={styles.actionButtonText}>Laden</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.actionButton, styles.deleteButton]}
+          onPress={() => handleDelete(item.id, item.name)}
+        >
+          <Text style={styles.actionButtonText}>Löschen</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -140,6 +155,9 @@ const styles = StyleSheet.create({
     flex: 1, // Take available space
     marginRight: 10, // Add some space before the button
   },
+  itemButtonContainer: {
+    flexDirection: "row", // Arrange buttons horizontally
+  },
   itemName: {
     fontSize: 18,
     fontWeight: "600",
@@ -155,13 +173,19 @@ const styles = StyleSheet.create({
     color: "#888",
     marginTop: 4,
   },
-  deleteButton: {
-    backgroundColor: "#ff4d4d", // Red color for delete
+  actionButton: {
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 5,
+    marginLeft: 5, // Space between buttons
   },
-  deleteButtonText: {
+  loadButton: {
+    backgroundColor: "#198754", // Green color for load
+  },
+  deleteButton: {
+    backgroundColor: "#dc3545", // Red color for delete
+  },
+  actionButtonText: {
     color: "#fff",
     fontWeight: "bold",
     fontSize: 14,

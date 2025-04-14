@@ -13,6 +13,7 @@ import {
   Platform,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native"; // Import useNavigation
 
 // Helper functions
 const parseTimeToSeconds = (timeStr) => {
@@ -82,6 +83,7 @@ const initialFormData = {
 };
 
 function CalculatorScreen() {
+  const navigation = useNavigation(); // Get navigation object
   const [formData, setFormData] = useState(initialFormData);
   const [startTime, setStartTime] = useState("");
   const [totalTime, setTotalTime] = useState("");
@@ -89,8 +91,7 @@ function CalculatorScreen() {
   const [saveName, setSaveName] = useState("");
 
   // Log when formData changes
-  useEffect(() => {
-  }, [formData]);
+  useEffect(() => {}, [formData]);
 
   const handleInputChange = useCallback((disciplineKey, field, value) => {
     setFormData((prevFormData) => {
@@ -610,6 +611,11 @@ function CalculatorScreen() {
                 <Button title="Speichern" onPress={savePaces} color="green" />
               )}
               <Button title="Clear All" onPress={clearFields} color="grey" />
+              <Button
+                title="Gespeicherte Paces"
+                onPress={() => navigation.navigate("SavedPaces")} // Navigate to SavedPaces screen
+                color="#ff8c00" // Example color
+              />
             </View>
           </View>
         </ScrollView>
@@ -687,6 +693,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
+    flexWrap: "wrap", // Allow buttons to wrap
     justifyContent: "space-around",
     alignItems: "center",
     width: "100%",

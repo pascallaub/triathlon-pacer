@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "./src/screens/HomeScreen"; // Pfad anpassen, falls nötig
 import CalculatorScreen from "./src/screens/CalculatorScreen"; // Pfad anpassen
 import StatisticsScreen from "./src/screens/StatisticsScreen"; // Pfad anpassen
+import SavedPacesScreen from "./src/screens/SavedPaces"; // Importiere den neuen Screen
 
 const Stack = createStackNavigator();
 
@@ -26,6 +27,11 @@ export default function App() {
           name="Statistics"
           component={StatisticsScreen}
           options={{ title: "Statistiken" }}
+        />
+        <Stack.Screen
+          name="SavedPaces" // Dieser Name muss mit dem in navigation.navigate übereinstimmen
+          component={SavedPacesScreen}
+          options={{ title: "Gespeicherte Paces" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

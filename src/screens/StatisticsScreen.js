@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from "react-native";
 function StatisticsScreen() {
   return (
     <View style={styles.container}>
-      <Text>Statistik Screen</Text>
+      <Text>Coming soon!</Text>
     </View>
   );
 }

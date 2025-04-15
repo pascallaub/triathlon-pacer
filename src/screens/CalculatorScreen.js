@@ -13,7 +13,7 @@ import {
   Platform,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation, useRoute } from "@react-navigation/native"; // Import useRoute along with useNavigation
+import { useNavigation, useRoute } from "@react-navigation/native"; // Import useRoute
 
 // Helper functions
 const parseTimeToSeconds = (timeStr) => {
@@ -84,41 +84,37 @@ const initialFormData = {
 
 function CalculatorScreen() {
   const navigation = useNavigation();
-  const route = useRoute(); // Get route object to access parameters
+  const route = useRoute(); // Get route object
   const [formData, setFormData] = useState(initialFormData);
   const [startTime, setStartTime] = useState("");
   const [totalTime, setTotalTime] = useState("");
   const [totalTimeInSeconds, setTotalTimeInSeconds] = useState(0);
   const [saveName, setSaveName] = useState("");
 
-  // Effect to load data when navigating back from SavedPacesScreen
+  // Effect to load data from route params
   useEffect(() => {
-    if (route.params?.selectedPaceSet) {
-      const loadedSet = route.params.selectedPaceSet;
-
-      // Create a new formData object from the loaded set
+    const loadedSet = route.params?.selectedPaceSet;
+    if (loadedSet) {
+      // Ensure all parts exist, providing defaults if necessary
       const newFormData = {
-        swim: { ...initialDisciplineState, ...loadedSet.swim },
-        t1: { ...initialTransitionState, ...loadedSet.t1 },
-        bike: { ...initialDisciplineState, ...loadedSet.bike },
-        t2: { ...initialTransitionState, ...loadedSet.t2 },
-        run: { ...initialDisciplineState, ...loadedSet.run },
+        swim: loadedSet.swim || { ...initialDisciplineState },
+        t1: loadedSet.t1 || { ...initialTransitionState },
+        bike: loadedSet.bike || { ...initialDisciplineState },
+        t2: loadedSet.t2 || { ...initialTransitionState },
+        run: loadedSet.run || { ...initialDisciplineState },
       };
-
       setFormData(newFormData);
       setStartTime(loadedSet.startTime || "");
       setTotalTime(loadedSet.totalTime || "");
       setTotalTimeInSeconds(loadedSet.totalTimeInSeconds || 0);
-      // Optionally pre-fill the save name for easier overwriting/saving
-      setSaveName(loadedSet.name || "");
+      setSaveName(loadedSet.name || ""); // Optionally prefill save name
 
-      // Clear the parameter to prevent reloading on subsequent renders/focus changes
-      navigation.setParams({ selectedPaceSet: null });
+      // Optional: Clear the parameter to prevent reloading on back navigation
+      // This might have side effects depending on navigation flow.
+      // Consider if this is the desired behavior.
+      // navigation.setParams({ selectedPaceSet: undefined });
     }
-  }, [route.params?.selectedPaceSet, navigation]); // Dependency array includes the parameter
-
-  // Log when formData changes
-  useEffect(() => {}, [formData]);
+  }, [route.params?.selectedPaceSet]); // Depend on the specific parameter
 
   const handleInputChange = useCallback((disciplineKey, field, value) => {
     setFormData((prevFormData) => {
@@ -638,11 +634,6 @@ function CalculatorScreen() {
                 <Button title="Speichern" onPress={savePaces} color="green" />
               )}
               <Button title="Clear All" onPress={clearFields} color="grey" />
-              <Button
-                title="Gespeicherte Paces"
-                onPress={() => navigation.navigate("SavedPaces")} // Navigate to SavedPaces screen
-                color="#ff8c00" // Example color
-              />
             </View>
           </View>
         </ScrollView>
